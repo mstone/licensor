@@ -1,0 +1,17 @@
+Default: &defaults
+  database: licensor.sqlite3
+
+Development:
+  <<: *defaults
+
+Test:
+  database: licensor_test.sqlite3
+  <<: *defaults
+
+Staging:
+  database: licensor_staging.sqlite3
+  <<: *defaults
+
+Production:
+  database: licensor_production.sqlite3
+  <<: *defaults
