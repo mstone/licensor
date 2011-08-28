@@ -14,6 +14,8 @@ module Foundation
     , module Model
     , StaticRoute (..)
     , AuthRoute (..)
+    , Project
+    , File
     ) where
 
 import Yesod
@@ -50,6 +52,9 @@ data Licensor = Licensor
     , getStatic :: Static -- ^ Settings for static file serving.
     , connPool :: Settings.ConnectionPool -- ^ Database connection pool.
     }
+
+type Project = T.Text
+type File    = T.Text
 
 -- This is where we define all of the routes in our application. For a full
 -- explanation of the syntax, please see:

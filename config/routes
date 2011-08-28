@@ -5,3 +5,13 @@
 /robots.txt RobotsR GET
 
 / RootR GET
+
+/i ImportR GET POST
+
+/p ProjectsR GET
+/p/#Project ProjectR GET
+
+/f FilesR GET
+/f/#File FileR GET POST
+
+/e/#Project ExportR GET

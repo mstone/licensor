@@ -10,3 +10,18 @@ $nothing
         You are not logged in. #
         <a href=@{AuthR LoginR}>Login now
         .
+
+<table
+  <tr
+    <td
+      <a href=@{ImportR}>Import some code!
+  <tr
+    <td
+      <a href=@{ProjectR ""}>Visit a project!
+  <tr
+    <td
+      <a href=@{FileR ""}>Visit a file!
+  <tr
+    <td
+      <a href=@{ExportR ""}>Export your work!
+
