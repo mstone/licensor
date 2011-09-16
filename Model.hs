@@ -3,6 +3,7 @@ module Model where
 
 import Yesod
 import Data.Text (Text)
+import Data.ByteString (ByteString)
 
 
 -- You can define all of your database entities in the entities file.

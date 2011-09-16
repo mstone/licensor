@@ -1,0 +1,6 @@
+Datum
+  path Text
+  hash ByteString
+  lic Text Maybe
+  
+  

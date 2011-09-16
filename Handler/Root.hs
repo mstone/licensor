@@ -24,7 +24,6 @@ import Text.Blaze
 -- inclined, or create a single monolithic file.
 getRootR :: Handler RepHtml
 getRootR = do
-    mu <- maybeAuth
     defaultLayout $ do
         h2id <- lift newIdent
         setTitle "licensor homepage"
@@ -33,7 +32,6 @@ getRootR = do
 
 getImportR :: Handler RepHtml
 getImportR = do
-    (uid, u) <- requireAuth
     let msg = Nothing :: Maybe LBS.ByteString
     defaultLayout $ do
         h2id <- lift newIdent
@@ -64,7 +62,6 @@ store es = do
 
 postImportR :: Handler RepHtml
 postImportR = do
-    (uid, u) <- requireAuth
     -- XXX: inspect user data!
     (_, files) <- runRequestBody
     file <- maybe (redirect RedirectSeeOther ImportR)
