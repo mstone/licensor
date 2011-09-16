@@ -69,7 +69,6 @@ executable         licensor
                  , persistent
                  , persistent-template
                  , persistent-sqlite >= 0.6 && < 0.7
-                 
                  , template-haskell
                  , hamlet               >= 0.10     && < 0.11
                  , shakespeare-css      >= 0.10     && < 0.11
@@ -82,6 +81,11 @@ executable         licensor
                  , warp
                  , blaze-builder
                  , cmdargs
+                 , filepath
+                 , cryptohash
+                 , zlib
+                 , tar
+                 , hex
 
     if !os(windows)
          build-depends: unix

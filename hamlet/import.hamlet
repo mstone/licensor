@@ -1,1 +1,9 @@
-Import
+<h1>Import
+
+$maybe m <- msg
+  #{show m}
+$nothing
+  <form method=post action=@{ImportR} enctype=multipart/form-data
+    File name:
+    <input type=file name=file
+    <input type=submit

@@ -2,7 +2,17 @@
 module Handler.Root where
 
 import Foundation
+import qualified Data.ByteString.Char8 as BS
+import qualified Data.ByteString.Lazy.Char8 as LBS
 import qualified Data.Text as T
+import qualified Codec.Archive.Tar as Tar
+import qualified Codec.Archive.Tar.Entry as Tar
+import qualified Codec.Compression.GZip as GZip
+import qualified Crypto.Hash.SHA1 as Sha1
+import qualified System.Directory as Dir
+import qualified System.FilePath as FilePath
+import qualified Data.Hex as Hex
+import System.FilePath ((</>))
 import Text.Blaze
 
 -- This is a handler function for the GET request method on the RootR
@@ -23,13 +33,46 @@ getRootR = do
 
 getImportR :: Handler RepHtml
 getImportR = do
+    (uid, u) <- requireAuth
+    let msg = Nothing :: Maybe LBS.ByteString
     defaultLayout $ do
         h2id <- lift newIdent
         setTitle $ "import project"
         addWidget $(widgetFile "import")
 
+storeEntry :: Tar.Entry -> IO ()
+storeEntry e = do
+  case Tar.entryContent e of
+    Tar.NormalFile txt len -> do
+      let tag = Sha1.hashlazy txt
+      let (a, tag') = BS.splitAt 1 tag
+      let (b, tag'') = BS.splitAt 1 tag'
+      let fmt = BS.unpack . Hex.hex
+      let (a', b', tag''') = (fmt a, fmt b, fmt tag'')
+      let dp = "state" </> a' </> b'
+      let fp = dp </> tag'''
+      Dir.createDirectoryIfMissing True dp
+      LBS.writeFile fp $ GZip.compress txt
+    _ -> return ()
+
+store :: Tar.Entries -> IO ()
+store es = do
+  case es of
+    Tar.Next e es' -> storeEntry e >> store es'
+    Tar.Done -> return ()
+    Tar.Fail msg -> fail ("import failed" ++ msg)
+
 postImportR :: Handler RepHtml
 postImportR = do
+    (uid, u) <- requireAuth
+    -- XXX: inspect user data!
+    (_, files) <- runRequestBody
+    file <- maybe (redirect RedirectSeeOther ImportR)
+                  (return . fileContent)
+                  (lookup "file" files)
+    let es = Tar.read $ GZip.decompress file
+    liftIO $ store es
+    let msg = Just "Project imported"
     defaultLayout $ do
         h2id <- lift newIdent
         setTitle $ "import project"
