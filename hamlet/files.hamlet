@@ -1,0 +1,6 @@
+<ul>
+  $forall p <- files
+    <li>
+      <a href=@{FileR $ fst p}>
+        #{datumPath $ snd p}
+  

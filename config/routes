@@ -12,6 +12,6 @@
 /p/#Project ProjectR GET
 
 /f FilesR GET
-/f/#File FileR GET POST
+/f/#DatumId FileR GET POST
 
 /e/#Project ExportR GET

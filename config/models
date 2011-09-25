@@ -1,6 +1,9 @@
 Datum
   path Text
   hash ByteString
+
+Assertion
+  datum DatumId
   lic Text Maybe
   
   

@@ -2,9 +2,13 @@
 module Handler.Root where
 
 import Foundation
+import Text.Hamlet (hamlet)
+import Control.Applicative ((<$>))
+import qualified Text.Blaze.Renderer.String as Blaze
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Char8 as LBS
 import qualified Data.Text as T
+import qualified Data.Text.Encoding as E
 import qualified Codec.Archive.Tar as Tar
 import qualified Codec.Archive.Tar.Entry as Tar
 import qualified Codec.Compression.GZip as GZip
@@ -25,7 +29,6 @@ import Text.Blaze
 getRootR :: Handler RepHtml
 getRootR = do
     defaultLayout $ do
-        h2id <- lift newIdent
         setTitle "licensor homepage"
         addWidget $(widgetFile "homepage")
 
@@ -34,11 +37,10 @@ getImportR :: Handler RepHtml
 getImportR = do
     let msg = Nothing :: Maybe LBS.ByteString
     defaultLayout $ do
-        h2id <- lift newIdent
         setTitle $ "import project"
         addWidget $(widgetFile "import")
 
-storeEntry :: Tar.Entry -> IO ()
+storeEntry :: Tar.Entry -> Handler ()
 storeEntry e = do
   case Tar.entryContent e of
     Tar.NormalFile txt len -> do
@@ -49,11 +51,14 @@ storeEntry e = do
       let (a', b', tag''') = (fmt a, fmt b, fmt tag'')
       let dp = "state" </> a' </> b'
       let fp = dp </> tag'''
-      Dir.createDirectoryIfMissing True dp
-      LBS.writeFile fp $ GZip.compress txt
+      liftIO $ Dir.createDirectoryIfMissing True dp
+      liftIO $ LBS.writeFile fp $ GZip.compress txt
+      let path = T.pack $ Tar.entryPath e
+      runDB $ insert $ Datum path tag
+      return ()
     _ -> return ()
 
-store :: Tar.Entries -> IO ()
+store :: Tar.Entries -> Handler ()
 store es = do
   case es of
     Tar.Next e es' -> storeEntry e >> store es'
@@ -68,10 +73,9 @@ postImportR = do
                   (return . fileContent)
                   (lookup "file" files)
     let es = Tar.read $ GZip.decompress file
-    liftIO $ store es
+    store es
     let msg = Just "Project imported"
     defaultLayout $ do
-        h2id <- lift newIdent
         setTitle $ "import project"
         addWidget $(widgetFile "import")
 
@@ -80,7 +84,6 @@ getProjectR project = do
     if project == ""
       then getProjectsR
       else defaultLayout $ do
-        h2id <- lift newIdent
         setTitle $ text $ T.append "project " project
         addWidget $(widgetFile "project")
 
@@ -92,34 +95,30 @@ getProjectsR = do
             project = ""
         addWidget $(widgetFile "project")
 
-getFileR :: File -> Handler RepHtml
-getFileR file = do
-    if file == ""
-      then getFilesR
-      else defaultLayout $ do
-        h2id <- lift newIdent
-        setTitle $ text $ T.append "get file " file
+getFileR :: DatumId -> Handler RepHtml
+getFileR did = do
+    mdat <- runDB $ get did
+    defaultLayout $ do
+        setTitle $ "get file"
         addWidget $(widgetFile "file")
 
-postFileR :: File -> Handler RepHtml
-postFileR file = do
+postFileR :: DatumId -> Handler RepHtml
+postFileR did = do
+    mdat <- runDB $ get did
     defaultLayout $ do
-        h2id <- lift newIdent
-        setTitle $ text $ T.append "post file " file
+        setTitle $ "post file"
         addWidget $(widgetFile "file")
 
 getFilesR :: Handler RepHtml
 getFilesR = do
+    files <- (runDB $ selectList [] []) :: Handler [(DatumId, Datum)]
     defaultLayout $ do
         setTitle $ text $ "files"
-        let file :: File
-            file = ""
-        addWidget $(widgetFile "file")
+        addWidget $(widgetFile "files")
 
 getExportR :: Project -> Handler RepHtml
 getExportR project = do
     defaultLayout $ do
-        h2id <- lift newIdent
         setTitle $ text $ T.append "export project " project
         addWidget $(widgetFile "export")
 

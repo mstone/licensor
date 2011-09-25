@@ -1,16 +1,13 @@
-<h1>Hello
-<h2 ##{h2id}>You do not have Javascript enabled.
-
 <table
   <tr
     <td
       <a href=@{ImportR}>Import some code!
   <tr
     <td
-      <a href=@{ProjectR ""}>Visit a project!
+      <a href=@{ProjectsR}>Visit a project!
   <tr
     <td
-      <a href=@{FileR ""}>Visit a file!
+      <a href=@{FilesR}>Visit a file!
   <tr
     <td
       <a href=@{ExportR ""}>Export your work!
