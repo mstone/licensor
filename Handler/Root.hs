@@ -1,9 +1,11 @@
 {-# LANGUAGE TemplateHaskell, QuasiQuotes, OverloadedStrings #-}
+{-# LANGUAGE MultiParamTypeClasses, TypeFamilies #-}
 module Handler.Root where
 
+import Yesod
 import Foundation
-import Text.Hamlet (hamlet)
-import Control.Applicative ((<$>))
+import Text.Hamlet (hamlet, shamlet)
+import Control.Applicative
 import qualified Text.Blaze.Renderer.String as Blaze
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Char8 as LBS
@@ -98,16 +100,41 @@ getProjectsR = do
 getFileR :: DatumId -> Handler RepHtml
 getFileR did = do
     mdat <- runDB $ get did
-    defaultLayout $ do
-        setTitle $ "get file"
-        addWidget $(widgetFile "file")
+    case mdat of
+      Nothing -> do
+        defaultLayout $ do
+            setTitle $ "get file"
+            toWidget [shamlet|<h1>No file. :(|]
+      Just dat -> do
+        let path = datumPath dat
+        let tag = datumHash dat
+        let (a, tag') = BS.splitAt 1 tag
+        let (b, tag'') = BS.splitAt 1 tag'
+        let fmt = BS.unpack . Hex.hex
+        let (a', b', tag''') = (fmt a, fmt b, fmt tag'')
+        let dp = "state" </> a' </> b'
+        let fp = dp </> tag'''
+        ctxt <- liftIO $ LBS.readFile fp
+        let txt = E.decodeUtf8 $ BS.concat $ LBS.toChunks $ GZip.decompress ctxt
+        assertions <- (runDB $ selectList [AssertionDatum ==. did] []) :: Handler [(AssertionId, Assertion)]
+        mPrevDid <- (runDB $ selectFirst [DatumId <. did] [Desc DatumId]) :: Handler (Maybe (DatumId, Datum))
+        mNextDid <- (runDB $ selectFirst [DatumId >. did] [Asc DatumId]) :: Handler (Maybe (DatumId, Datum))
+        defaultLayout $ do
+            setTitle $ "get file"
+            addWidget $(widgetFile "file")
 
 postFileR :: DatumId -> Handler RepHtml
 postFileR did = do
     mdat <- runDB $ get did
-    defaultLayout $ do
-        setTitle $ "post file"
-        addWidget $(widgetFile "file")
+    case mdat of
+      Nothing -> do
+        defaultLayout $ do
+            setTitle $ "post file"
+            toWidget [shamlet|<h1>No file. :(|]
+      Just dat -> do
+        lic <- runInputPost $ ireq textField "lic"
+        runDB $ insert $ Assertion did $ Just lic
+        redirect RedirectSeeOther $ FileR did
 
 getFilesR :: Handler RepHtml
 getFilesR = do

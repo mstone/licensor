@@ -1,6 +1,7 @@
 Datum
   path Text
   hash ByteString
+  PathHash path hash
 
 Assertion
   datum DatumId

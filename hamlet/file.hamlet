@@ -1,5 +1,22 @@
-$maybe dat <- mdat
-  <h1>File #{datumPath dat}!
-  <h1>Hash #{E.decodeUtf8 $ Hex.hex $ datumHash dat}!
-$nothing
-  <h1>No file. :(
+<h1>#{datumPath dat}
+<form method=post action@{FileR} enctype=multipart/form-data
+  $maybe prevDid <- mPrevDid
+    <a href=@{FileR $ fst prevDid}>
+      Prev
+    \ #
+  License:
+  <input name=lic type=text
+  <input type=submit
+  \ #
+  $maybe nextDid <- mNextDid
+    <a href=@{FileR $ fst nextDid}
+      Next
+
+
+<p>Previous assertions:
+<ul>
+  $forall a <- assertions
+    $maybe lic <- assertionLic $ snd a
+      <li>#{lic}
+
+<pre>#{txt}
