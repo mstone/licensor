@@ -1,10 +1,12 @@
+Archive
+  hash        ByteString
+
 Datum
-  path Text
-  hash ByteString
-  PathHash path hash
+  archiveId   ArchiveId
+  path        Text
+  hash        ByteString
+  UniqueDatum archiveId path hash
 
 Assertion
-  datum DatumId
-  lic Text Maybe
-  
-  
+  datumId     DatumId
+  license     Text Maybe

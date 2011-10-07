@@ -8,10 +8,9 @@
 
 /i ImportR GET POST
 
-/p ProjectsR GET
-/p/#Project ProjectR GET
+/a ArchiveSetR GET
+/a/#ArchiveId ArchiveR GET
+/a/#ArchiveId/dep5 ArchiveDep5R GET
 
-/f FilesR GET
+/f FileSetR GET
 /f/#DatumId FileR GET POST
-
-/e/#Project ExportR GET

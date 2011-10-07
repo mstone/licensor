@@ -1,0 +1,6 @@
+<h1>Archive #{atag}
+<ul>
+  $forall dat <- dats
+    <li>
+      <a href=@{FileR $ fst dat}>
+        #{datumPath $ snd dat}

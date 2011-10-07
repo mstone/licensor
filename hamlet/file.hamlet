@@ -16,7 +16,7 @@
 <p>Previous assertions:
 <ul>
   $forall a <- assertions
-    $maybe lic <- assertionLic $ snd a
+    $maybe lic <- assertionLicense $ snd a
       <li>#{lic}
 
 <pre>#{txt}

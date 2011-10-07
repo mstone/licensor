@@ -1,0 +1,5 @@
+<ul>
+  $forall a <- ars
+    <li>
+      <a href=@{ArchiveR $ fst a}>
+        #{E.decodeUtf8 $ Hex.hex $ archiveHash $ snd a}

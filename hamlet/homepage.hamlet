@@ -4,11 +4,7 @@
       <a href=@{ImportR}>Import some code!
   <tr
     <td
-      <a href=@{ProjectsR}>Visit a project!
+      <a href=@{ArchiveSetR}>Visit an archive!
   <tr
     <td
-      <a href=@{FilesR}>Visit a file!
-  <tr
-    <td
-      <a href=@{ExportR ""}>Export your work!
-
+      <a href=@{FileSetR}>Visit a file!
